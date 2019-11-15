@@ -6,18 +6,20 @@ const initialItem = {
   title: "",
   director: "",
   metascore: "",
-  stars: "",
-  id: ""
+  stars: ""
 };
 
 const UpdateForm = props => {
-  const [item, setItem] = useState(initialItem);
+  const [item, setItem] = useState({
+    ...initialItem,
+    id: props.match.params.id
+  });
 
   const changeHandler = event => {
-    let item = event.target.value;
+    let value = event.target.value;
     setItem({
       ...item,
-      [event.target.value]: item
+      [event.target.name]: value
     });
   };
 
@@ -31,9 +33,15 @@ const UpdateForm = props => {
   //   }, [props.item, props.match.params.id]);
 
   const handleSubmit = event => {
+    const id = props.match.params.id;
+
     event.preventDefault();
+
     axios
-      .put("http://localhost:5000/api/movies/:id", item)
+      .put(`http://localhost:5000/api/movies/${id}`, {
+        ...item,
+        stars: item.stars.split(",")
+      })
       .then(res => {
         props.updateItems(res.data);
         props.history.push("/movies/:id");
@@ -48,44 +56,36 @@ const UpdateForm = props => {
   return (
     <>
       <h2>Update Movie</h2>
-      <form>
-        <input
-          type="text"
-          name="title"
-          placeholder="Movie Name"
-          onChange={changeHandler}
-          value={item.title}
-        />
-        <input
-          type="text"
-          name="director"
-          placeholder="Director"
-          onChange={changeHandler}
-          value={item.director}
-        />
-        <input
-          type="number"
-          name="metascore"
-          placeholder="Metascore"
-          onChange={changeHandler}
-          value={item.metascore}
-        />
-        <input
-          type="text"
-          name="stars"
-          placeholder="Stars"
-          onChange={changeHandler}
-          value={item.stars}
-        />
-        <input
-          type="text"
-          name="id"
-          placeholder="id"
-          onChange={changeHandler}
-          value={item.id}
-        />
-        <button onClick={handleSubmit}>Submit</button>
-      </form>
+      {item.stars}
+      <input
+        type="text"
+        name="title"
+        placeholder="Movie Name"
+        onChange={changeHandler}
+        value={item.title}
+      />
+      <input
+        type="text"
+        name="director"
+        placeholder="Director"
+        onChange={changeHandler}
+        value={item.director}
+      />
+      <input
+        type="number"
+        name="metascore"
+        placeholder="Metascore"
+        onChange={changeHandler}
+        value={item.metascore}
+      />
+      <input
+        type="text"
+        name="stars"
+        placeholder="Stars"
+        onChange={changeHandler}
+        value={item.stars}
+      />
+      <button onClick={handleSubmit}>Submit</button>
     </>
   );
 };
